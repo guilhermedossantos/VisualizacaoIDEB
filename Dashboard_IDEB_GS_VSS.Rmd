@@ -60,12 +60,17 @@ selectInput("nivelescolaridade",
 #             "Rede de Ensino",
 #             choices = c())
 
-sliderInput(inputId = "ano",
+# sliderInput(inputId = "ano",
+#             label = "Ano",
+#             min = 2005,
+#             max = 2017,
+#             value = 2011,
+#             step = 2)
+
+selectInput("ano",
             label = "Ano",
-            min = 2005,
-            max = 2017,
-            value = 2011,
-            step = 1)
+            choices = seq(2005, 2017, by = 2),
+            selected = "2011")
 
 
 ```
@@ -96,7 +101,7 @@ output$teste <- renderPlotly({
   selected_data() %>% 
     ggplot() +
     geom_sf(aes(fill = IDEB, text = hover)) +
-    scale_fill_viridis_c(begin = 0, end = 1) -> p
+    scale_fill_viridis_c(direction = -1, limits = c(0,10)) -> p
   
   g <- ggplotly(p)
   
