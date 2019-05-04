@@ -56,12 +56,18 @@ selectInput("nivelescolaridade",
                         "Ensido médio" = "EM"),
             selected = "EFI")
 
+# selectInput("rede",
+#             "Rede de Ensino",
+#             choices = c())
+
 sliderInput(inputId = "ano",
             label = "Ano",
             min = 2005,
             max = 2017,
             value = 2011,
             step = 1)
+
+
 ```
 
 Column {data-width=350}
@@ -75,10 +81,10 @@ selected_data <- reactive({
   aaa <- get_brmap(geo = "State") %>% 
     left_join(estados, by = c("nome" = "UF")) %>%
     filter(NivelEscolaridade == input$nivelescolaridade, 
-           Ano == input$ano)
-  
-  aaa$hover = with(aaa, paste("UF:", nome, '<br>',
-                              "ideb:", IDEB))
+           Ano == input$ano,
+           Rede == "Total") %>%
+    mutate(hover = paste("UF:", nome, '<br>','ideb: ',IDEB))
+
   
   aaa
   })
