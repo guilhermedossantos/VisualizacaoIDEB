@@ -1,2 +1,5 @@
-# Visualiza-o_IDEB
+# Visualizacao_IDEB
 Desafio de Visualização
+
+Objetivo: dashboard
+
