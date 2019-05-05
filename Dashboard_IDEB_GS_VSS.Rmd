@@ -32,9 +32,8 @@ estados$UF <- str_replace_all(estados$UF, "M. G.", "Mato Grosso") %>%
   str_replace_all("R. G.", "Rio Grande") %>%
   str_to_upper() #P poder dar o join com o mapa sem precisar do código do estado
 #cod_ufs <- read_excel("Codigos_ufs.xlsx") #talvez nem precisemos
-
 estados %>% mutate(Regiao = str_replace_all(Regiao, "SU","S") %>%
-                     str_replace_all("NO","N"))
+                     str_replace_all("NO","N")) -> estados
 ```
 
 Escala Estadual
@@ -87,9 +86,7 @@ selected_data <- reactive({
   
   aaa
   })
-
 # Com as chaves eu posso escrever expressões aqui e no final retornar algo
-
 output$mapaestados <- renderPlotly({
   
   selected_data() %>% 
@@ -180,7 +177,6 @@ Escala Regional
 
 ### Violinos do IDEB dentro de cada região
 ```{r}
-
 # estados %>% 
 #   filter(ensino %in% c("Público", "Privado")) %>% 
 #   ggplot(aes(x = NivelEscolaridade, y = IDEB)) +
@@ -188,8 +184,6 @@ Escala Regional
 #   facet_wrap(~ensino) -> p
 # 
 # p
-
-
 p <- estados %>%
   filter(Rede == "Total") %>%
   plot_ly(
@@ -204,7 +198,6 @@ p <- estados %>%
       visible = T
     )
   )
-
 p
 ```
 
@@ -260,14 +253,13 @@ sel_data <- reactive({
   
   aad
   })
-
 # Com as chaves eu posso escrever expressões aqui e no final retornar algo
 output$teste2 <- renderPlotly({
   
   sel_data() %>% 
     ggplot(aes(x = Ano)) +
-    geom_line(aes(y = IDEB)) +
-    geom_line(aes(y = Proj), linetype = "dashed") +
+    geom_line(aes(y = IDEB, group = Rede)) +
+    geom_line(aes(y = Proj, group = Rede), linetype = "dashed") +
     ylab("IDEB e Projeção")-> p
   
   g <- ggplotly(p)
@@ -291,7 +283,6 @@ output$teste2 <- renderPlotly({
   g
   
 })
-
 plotlyOutput("teste2")
 ```
 
@@ -300,7 +291,6 @@ plotlyOutput("teste2")
 ### Densidades do IDEB para as redes ao longo dos anos
 
 ```{r}
-
   estados %>%
   filter(Rede %in% c("Pública", "Privada")) %>% 
   ggplot(aes(x = IDEB, y = ..density.., fill = Ano)) +
@@ -314,6 +304,4 @@ plotlyOutput("teste2")
   
   g
   
-
 ```
-
