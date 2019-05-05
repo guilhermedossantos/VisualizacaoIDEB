@@ -7,7 +7,7 @@ Desafio de Visualização
 
 - Ver o que vamos fazer no nível regional: 
 
-       - densidades das regiões (tinha outros gráficos pra nível regilnal que tínhamos feito?)
+       - densidades das regiões (tinha outros gráficos pra nível regional que tínhamos feito?)
 
 - Nível estadual?
 
