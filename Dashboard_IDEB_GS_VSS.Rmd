@@ -32,6 +32,9 @@ estados$UF <- str_replace_all(estados$UF, "M. G.", "Mato Grosso") %>%
   str_replace_all("R. G.", "Rio Grande") %>%
   str_to_upper() #P poder dar o join com o mapa sem precisar do código do estado
 #cod_ufs <- read_excel("Codigos_ufs.xlsx") #talvez nem precisemos
+
+estados %>% mutate(Regiao = str_replace_all(Regiao, "SU","S") %>%
+                     str_replace_all("NO","N"))
 ```
 
 Escala Estadual
@@ -84,8 +87,10 @@ selected_data <- reactive({
   
   aaa
   })
+
 # Com as chaves eu posso escrever expressões aqui e no final retornar algo
-output$teste <- renderPlotly({
+
+output$mapaestados <- renderPlotly({
   
   selected_data() %>% 
     ggplot() +
@@ -113,7 +118,7 @@ output$teste <- renderPlotly({
   g
   
 })
-plotlyOutput("teste")
+plotlyOutput("mapaestados")
 ```
 
 
@@ -122,7 +127,6 @@ Row {data-width=500}
 
 ### Desempenho escolar por Taxa de Aprovação para os estados
 ```{r}
-
 dados_selecionados <- reactive({
   aab <- estados %>%
     filter(NivelEscolaridade == input$nivelescolaridade, 
@@ -166,8 +170,6 @@ output$teste1 <- renderPlotly({
   
 })
 plotlyOutput("teste1")
-
-
 ```
 
 
@@ -175,6 +177,37 @@ plotlyOutput("teste1")
 
 Escala Regional
 =====================================
+
+### Violinos do IDEB dentro de cada região
+```{r}
+
+# estados %>% 
+#   filter(ensino %in% c("Público", "Privado")) %>% 
+#   ggplot(aes(x = NivelEscolaridade, y = IDEB)) +
+#   geom_boxplot() +
+#   facet_wrap(~ensino) -> p
+# 
+# p
+
+
+p <- estados %>%
+  filter(Rede == "Total") %>%
+  plot_ly(
+    x = ~Regiao,
+    y = ~IDEB,
+    split = ~Regiao,
+    type = 'violin',
+    box = list(
+      visible = T
+    ),
+    meanline = list(
+      visible = T
+    )
+  )
+
+p
+```
+
 
 
 
@@ -209,7 +242,6 @@ selectInput("redebr",
 #             max = 2017,
 #             value = 2011,
 #             step = 2)
-
 ```
 
 
@@ -228,6 +260,7 @@ sel_data <- reactive({
   
   aad
   })
+
 # Com as chaves eu posso escrever expressões aqui e no final retornar algo
 output$teste2 <- renderPlotly({
   
@@ -258,6 +291,29 @@ output$teste2 <- renderPlotly({
   g
   
 })
+
 plotlyOutput("teste2")
+```
+
+
+
+### Densidades do IDEB para as redes ao longo dos anos
+
+```{r}
+
+  estados %>%
+  filter(Rede %in% c("Pública", "Privada")) %>% 
+  ggplot(aes(x = IDEB, y = ..density.., fill = Ano)) +
+  geom_density() +
+  ylab("Densidade") +
+  facet_wrap(~Rede) + 
+  theme_classic()  -> p
+  
+  g <- ggplotly(p)
+  
+  
+  g
+  
+
 ```
 
