@@ -6,6 +6,7 @@ Desafio de Visualização
 - Colocar aquele gráfico de densidades p as redes pública e privada no nível nacional (mas interativo dessa vez)
 
 - Ver o que vamos fazer no nível regional: 
+
        - densidades das regiões (tinha outros gráficos pra nível regilnal que tínhamos feito?)
 
 - Nível estadual?
