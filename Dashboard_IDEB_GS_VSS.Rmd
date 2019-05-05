@@ -27,7 +27,7 @@ suppressPackageStartupMessages({
 ```{r global, include = FALSE}
 br <- read_excel("br_tidy.xlsx")
 estados <- read_excel("estados_tidy.xlsx")
-censo <- read_excel
+#censo <- read_excel
 estados$UF <- str_replace_all(estados$UF, "M. G.", "Mato Grosso") %>% 
   str_replace_all("R. G.", "Rio Grande") %>%
   str_to_upper() #P poder dar o join com o mapa sem precisar do código do estado
@@ -71,7 +71,6 @@ selectInput("ano",
 Row {data-width=500}
 -----------------------------------------------------------------------
 
-
 ### IDEB para os estados
 
 ```{r}
@@ -91,7 +90,7 @@ output$teste <- renderPlotly({
   selected_data() %>% 
     ggplot() +
     geom_sf(aes(fill = IDEB, text = hover)) +
-    scale_fill_viridis_c(direction = -1, limits = c(0,10)) -> p
+    scale_fill_viridis_c(direction = -1, limits = c(0,10),option = "C") -> p
   
   g <- ggplotly(p)
   
@@ -115,55 +114,6 @@ output$teste <- renderPlotly({
   
 })
 plotlyOutput("teste")
-```
-
-### Densidade
-```{r}
-
-dados_selec <- reactive({
-  aac <- estados %>%
-    filter(NivelEscolaridade == input$nivelescolaridade, 
-           Ano == input$ano,
-           Rede == input$rede) #%>%
-    #mutate(hover = paste("UF:", nome, '<br>','ideb: ',IDEB))
-  
-  aac
-  })
-
-output$teste2 <- renderPlotly({
-  
-  dados_selec() %>% 
-    ggplot() +
-    geom_density(aes(x = IDEB, y = ..density.., fill = Ano), show.legend = FALSE)+
-  scale_x_continuous(limits = c(0, 10)) +
-  ylab("Densidade") +
-  facet_wrap(~Rede) + 
-  theme(legend.position="none")  -> p
-  
-  g <- ggplotly(p)
-  
-  #build <- plotly_build(g)
-  
-  #build$data[[1]]$text <- paste0('UF: ', selected_data()$UF, '<br>', 
-  #                               'IDEB: ', as.character(round(selected_data()$IDEB,
-   #                                                           2))) 
-  
-  #build
-   
-  
-  # g %>%
-  #   add_trace(
-  #     z = ~IDEB,
-  #     text =  ~hover,
-  #     locations = ~geometry,
-  #     hoverinfo = 'text',
-  #     marker = list(color='green')) -> g
-  g
-  
-})
-plotlyOutput("teste2")
-
-
 ```
 
 
@@ -234,7 +184,80 @@ Escala Nacional
 =====================================
 
 
+Column{.sidebar}
+-----------------------------------------------------------------------
+
+  A intenção é essa aqui ser a sidebar para a pessoa poder selecionar os inputs e ter uma dessa em cada aba da tabela
+
+```{r}
+# Talvez oferecer escolha de nível escolar e rede de ensino
+selectInput("nivelescolaridadebr",
+            label = "Nível de Ensino",
+            choices = c("Fundamental anos iniciais" = "EFI",
+                        "Fundamental anos finais" = "EFF",
+                        "Ensido médio" = "EM"),
+            selected = "EFI")
+selectInput("redebr",
+            "Rede de Ensino",
+            choices = c("Pública" = "Estadual",
+                        "Privada" = "Privada",
+                        "Total" = "Total"),
+            selected = "Total")
+# sliderInput(inputId = "ano",
+#             label = "Ano",
+#             min = 2005,
+#             max = 2017,
+#             value = 2011,
+#             step = 2)
+
+```
 
 
+Row {data-width=500}
+-----------------------------------------------------------------------
 
+
+### IDEB
+
+```{r}
+sel_data <- reactive({
+ 
+    aad <- br %>%
+    filter(NivelEscolaridade == input$nivelescolaridadebr,
+           Rede == input$redebr) 
+  
+  aad
+  })
+# Com as chaves eu posso escrever expressões aqui e no final retornar algo
+output$teste2 <- renderPlotly({
+  
+  sel_data() %>% 
+    ggplot(aes(x = Ano)) +
+    geom_line(aes(y = IDEB)) +
+    geom_line(aes(y = Proj), linetype = "dashed") +
+    ylab("IDEB e Projeção")-> p
+  
+  g <- ggplotly(p)
+  
+  #build <- plotly_build(g)
+  
+  #build$data[[1]]$text <- paste0('UF: ', selected_data()$UF, '<br>', 
+  #                               'IDEB: ', as.character(round(selected_data()$IDEB,
+   #                                                           2))) 
+  
+  #build
+   
+  
+  # g %>%
+  #   add_trace(
+  #     z = ~IDEB,
+  #     text =  ~hover,
+  #     locations = ~geometry,
+  #     hoverinfo = 'text',
+  #     marker = list(color='green')) -> g
+  g
+  
+})
+plotlyOutput("teste2")
+```
 
