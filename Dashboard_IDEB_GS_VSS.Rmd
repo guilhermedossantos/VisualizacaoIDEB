@@ -1,10 +1,11 @@
 ---
-title: "Visualização dos dados do IDEB"
+title: "Visualização - IDEB"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
+    orientation: rows
+    vertical_layout: scroll
     runtime: shiny
+    theme: flatly
 ---
 
 ```{r setup, include=FALSE}
@@ -39,7 +40,7 @@ estados$UF <- str_replace_all(estados$UF, "M. G.", "Mato Grosso") %>%
 
 ```
 
-Escala Estadual
+Escala Nacional
 =====================================
 
 Column{.sidebar}
@@ -75,7 +76,7 @@ selectInput("ano",
 
 ```
 
-Column {data-width=350}
+Row {data-width=350}
 -----------------------------------------------------------------------
 
 ### IDEB para os estados
@@ -129,6 +130,19 @@ plotlyOutput("teste")
 ```
 
 
+Row 
+-----------------------------------------------------------------------
+
+### Densidade
+```{r}
+
+```
+
+### N sei
+```{r}
+
+```
+
 
 
 Escala Regional
@@ -137,7 +151,7 @@ Escala Regional
 
 
 
-Escala Nacional
+Escala Estadual
 =====================================
 
 
