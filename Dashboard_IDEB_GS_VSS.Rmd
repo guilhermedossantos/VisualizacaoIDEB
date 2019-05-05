@@ -21,7 +21,6 @@ suppressPackageStartupMessages({
   library(stringr)
   library(viridis)
 })
-
 ```
 
 
@@ -29,18 +28,13 @@ suppressPackageStartupMessages({
 br <- read_excel("br_tidy.xlsx")
 estados <- read_excel("estados_tidy.xlsx")
 censo <- read_excel
-
 estados$UF <- str_replace_all(estados$UF, "M. G.", "Mato Grosso") %>% 
   str_replace_all("R. G.", "Rio Grande") %>%
   str_to_upper() #P poder dar o join com o mapa sem precisar do código do estado
-
 #cod_ufs <- read_excel("Codigos_ufs.xlsx") #talvez nem precisemos
-
-
-
 ```
 
-Escala Nacional
+Escala Estadual
 =====================================
 
 Column{.sidebar}
@@ -56,46 +50,41 @@ selectInput("nivelescolaridade",
                         "Fundamental anos finais" = "EFF",
                         "Ensido médio" = "EM"),
             selected = "EFI")
-
-# selectInput("rede",
-#             "Rede de Ensino",
-#             choices = c())
-
+selectInput("rede",
+            "Rede de Ensino",
+            choices = c("Pública" = "Estadual",
+                        "Privada" = "Privada",
+                        "Total" = "Total"),
+            selected = "Total")
 # sliderInput(inputId = "ano",
 #             label = "Ano",
 #             min = 2005,
 #             max = 2017,
 #             value = 2011,
 #             step = 2)
-
 selectInput("ano",
             label = "Ano",
             choices = seq(2005, 2017, by = 2),
             selected = "2011")
-
-
 ```
 
-Row {data-width=350}
+Row {data-width=500}
 -----------------------------------------------------------------------
+
 
 ### IDEB para os estados
 
 ```{r}
-
 selected_data <- reactive({
   aaa <- get_brmap(geo = "State") %>% 
     left_join(estados, by = c("nome" = "UF")) %>%
     filter(NivelEscolaridade == input$nivelescolaridade, 
            Ano == input$ano,
-           Rede == "Total") %>%
+           Rede == input$rede) %>%
     mutate(hover = paste("UF:", nome, '<br>','ideb: ',IDEB))
-
   
   aaa
   })
-
-
 # Com as chaves eu posso escrever expressões aqui e no final retornar algo
 output$teste <- renderPlotly({
   
@@ -125,23 +114,112 @@ output$teste <- renderPlotly({
   g
   
 })
-
 plotlyOutput("teste")
 ```
-
-
-Row 
------------------------------------------------------------------------
 
 ### Densidade
 ```{r}
 
+dados_selec <- reactive({
+  aac <- estados %>%
+    filter(NivelEscolaridade == input$nivelescolaridade, 
+           Ano == input$ano,
+           Rede == input$rede) #%>%
+    #mutate(hover = paste("UF:", nome, '<br>','ideb: ',IDEB))
+  
+  aac
+  })
+
+output$teste2 <- renderPlotly({
+  
+  dados_selec() %>% 
+    ggplot() +
+    geom_density(aes(x = IDEB, y = ..density.., fill = Ano), show.legend = FALSE)+
+  scale_x_continuous(limits = c(0, 10)) +
+  ylab("Densidade") +
+  facet_wrap(~Rede) + 
+  theme(legend.position="none")  -> p
+  
+  g <- ggplotly(p)
+  
+  #build <- plotly_build(g)
+  
+  #build$data[[1]]$text <- paste0('UF: ', selected_data()$UF, '<br>', 
+  #                               'IDEB: ', as.character(round(selected_data()$IDEB,
+   #                                                           2))) 
+  
+  #build
+   
+  
+  # g %>%
+  #   add_trace(
+  #     z = ~IDEB,
+  #     text =  ~hover,
+  #     locations = ~geometry,
+  #     hoverinfo = 'text',
+  #     marker = list(color='green')) -> g
+  g
+  
+})
+plotlyOutput("teste2")
+
+
 ```
 
-### N sei
+
+Row {data-width=500}
+-----------------------------------------------------------------------
+
+### Desempenho escolar por Taxa de Aprovação para os estados
 ```{r}
 
+dados_selecionados <- reactive({
+  aab <- estados %>%
+    filter(NivelEscolaridade == input$nivelescolaridade, 
+           Ano == input$ano,
+           Rede == input$rede) #%>%
+    #mutate(hover = paste("UF:", nome, '<br>','ideb: ',IDEB))
+  
+  aab
+  })
+# Com as chaves eu posso escrever expressões aqui e no final retornar algo
+output$teste1 <- renderPlotly({
+  
+  dados_selecionados() %>% 
+    ggplot() +
+    geom_point(aes(x = N, y = P,
+                   size = IDEB, fill = UF), show.legend = FALSE) +
+    #scale_x_continuous(limits = c(0, 10)) +
+    #scale_y_continuous(limits = c(0, 1)) +
+    xlab("Nota média padronizada") +
+    ylab("Taxa de Aprovação") -> p
+  
+  g <- ggplotly(p)
+  
+  #build <- plotly_build(g)
+  
+  #build$data[[1]]$text <- paste0('UF: ', selected_data()$UF, '<br>', 
+  #                               'IDEB: ', as.character(round(selected_data()$IDEB,
+   #                                                           2))) 
+  
+  #build
+   
+  
+  # g %>%
+  #   add_trace(
+  #     z = ~IDEB,
+  #     text =  ~hover,
+  #     locations = ~geometry,
+  #     hoverinfo = 'text',
+  #     marker = list(color='green')) -> g
+  g
+  
+})
+plotlyOutput("teste1")
+
+
 ```
+
 
 
 
@@ -151,9 +229,9 @@ Escala Regional
 
 
 
-Escala Estadual
-=====================================
 
+Escala Nacional
+=====================================
 
 
 
