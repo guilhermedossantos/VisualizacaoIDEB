@@ -42,7 +42,7 @@ Escala Estadual
 Column{.sidebar}
 -----------------------------------------------------------------------
 
-  A intenção é essa aqui ser a sidebar para a pessoa poder selecionar os inputs e ter uma dessa em cada aba da tabela
+  Painel para a seleção do Nível de escolaridade, Dependência admnistrativa e Ano dejados:
 
 ```{r}
 # Talvez oferecer escolha de nível escolar e rede de ensino
@@ -213,7 +213,7 @@ Escala Nacional
 Column{.sidebar}
 -----------------------------------------------------------------------
 
-  A intenção é essa aqui ser a sidebar para a pessoa poder selecionar os inputs e ter uma dessa em cada aba da tabela
+  Seleção do nível de ensino e dependência admnistrativa:
 
 ```{r}
 # Talvez oferecer escolha de nível escolar e rede de ensino
