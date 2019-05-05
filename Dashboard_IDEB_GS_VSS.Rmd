@@ -92,7 +92,7 @@ output$mapaestados <- renderPlotly({
   selected_data() %>% 
     ggplot() +
     geom_sf(aes(fill = IDEB, text = hover)) +
-    scale_fill_viridis_c(direction = -1, limits = c(0,10),option = "C") -> p
+    scale_fill_viridis_c(direction = -1, limits = c(2,8),option = "C") -> p
   
   g <- ggplotly(p)
   
