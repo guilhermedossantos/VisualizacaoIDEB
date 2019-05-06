@@ -17,7 +17,7 @@ suppressPackageStartupMessages({
   library(plotly)
   library(maps)
   library(brazilmaps)
-  library(highcharter) #talvez se um de nós souber como usar 
+  #library(highcharter) #talvez se um de nós souber como usar 
   library(stringr)
   library(viridis)
 })
@@ -25,7 +25,7 @@ suppressPackageStartupMessages({
 
 
 ```{r global, include = FALSE}
-br <- read_excel("br_tidy.xlsx")
+br <- read_excel("BR_tidy.xlsx")
 estados <- read_excel("estados_tidy.xlsx")
 #censo <- read_excel
 estados$UF <- str_replace_all(estados$UF, "M. G.", "Mato Grosso") %>% 
@@ -44,7 +44,7 @@ Escala Nacional
 Column{.sidebar}
 -----------------------------------------------------------------------
 
-  Seleção do nível de ensino e dependência admnistrativa:
+  Seleção do nível e rede de ensino e ensino:
 
 ```{r}
 # Talvez oferecer escolha de nível escolar e rede de ensino
@@ -52,7 +52,7 @@ selectInput("nivelescolaridadebr",
             label = "Nível de Ensino",
             choices = c("Fundamental anos iniciais" = "EFI",
                         "Fundamental anos finais" = "EFF",
-                        "Ensido médio" = "EM"),
+                        "Ensino médio" = "EM"),
             selected = "EFI")
 selectInput("redebr",
             "Rede de Ensino",
@@ -84,33 +84,19 @@ sel_data <- reactive({
   
   aad
   })
-# Com as chaves eu posso escrever expressões aqui e no final retornar algo
+
+# Com as chaves podemos escrever expressões aqui e no final retornar algo
 output$teste2 <- renderPlotly({
   
   sel_data() %>% 
     ggplot(aes(x = Ano)) +
     geom_line(aes(y = IDEB, group = Rede)) +
     geom_line(aes(y = Proj, group = Rede), linetype = "dashed") +
-    ylab("IDEB e Projeção")-> p
+    ylab("IDEB e Projeção") -> p
   
   g <- ggplotly(p)
   
-  #build <- plotly_build(g)
   
-  #build$data[[1]]$text <- paste0('UF: ', selected_data()$UF, '<br>', 
-  #                               'IDEB: ', as.character(round(selected_data()$IDEB,
-   #                                                           2))) 
-  
-  #build
-   
-  
-  # g %>%
-  #   add_trace(
-  #     z = ~IDEB,
-  #     text =  ~hover,
-  #     locations = ~geometry,
-  #     hoverinfo = 'text',
-  #     marker = list(color='green')) -> g
   g
   
 })
@@ -118,6 +104,8 @@ plotlyOutput("teste2")
 ```
 
 
+Row {data-width=500}
+-----------------------------------------------------------------------
 
 ### Densidades do IDEB para as redes ao longo dos anos
 
@@ -140,7 +128,10 @@ plotlyOutput("teste2")
 Escala Regional
 =====================================
 
-###IDEB
+Row {data-width=500}
+-----------------------------------------------------------------------
+
+### Densidades do IDEB por região
 
 ```{r}
 estados %>%
@@ -148,28 +139,23 @@ estados %>%
     filter(!Ano %in% c("2019", "2021")) %>% 
     ggplot(aes(x = IDEB,
                fill = Regiao)) +
-    geom_density(alpha= 0.6) +
+    geom_density(alpha= 0.7) +
     scale_fill_manual(values = c("blue", "orange", "green", "red", "purple"))+
     facet_grid(NivelEscolaridade~ensino) +
-    ylab("Densidade") +
-    theme(legend.position = "none")-> p
+    ylab("Densidade") -> p
+
 
 g <- ggplotly(p)
-
 g
-
 ```
 
 
+Row {data-width=500}
+-----------------------------------------------------------------------
+
 ### Violinos do IDEB dentro de cada região
 ```{r}
-# estados %>% 
-#   filter(ensino %in% c("Público", "Privado")) %>% 
-#   ggplot(aes(x = NivelEscolaridade, y = IDEB)) +
-#   geom_boxplot() +
-#   facet_wrap(~ensino) -> p
-# 
-# p
+
 p <- estados %>%
   filter(Rede == "Total") %>%
   plot_ly(
@@ -194,7 +180,7 @@ Escala Estadual
 Column{.sidebar}
 -----------------------------------------------------------------------
 
-  Painel para a seleção do nível de escolaridade, dependência administrativa e ano desejados:
+  Painel para a seleção do nível de escolaridade, rede de ensino e ano desejados:
 
 ```{r}
 # Talvez oferecer escolha de nível escolar e rede de ensino
@@ -202,7 +188,7 @@ selectInput("nivelescolaridade",
             label = "Nível de Ensino",
             choices = c("Fundamental anos iniciais" = "EFI",
                         "Fundamental anos finais" = "EFF",
-                        "Ensido médio" = "EM"),
+                        "Ensino médio" = "EM"),
             selected = "EFI")
 selectInput("rede",
             "Rede de Ensino",
@@ -225,7 +211,7 @@ selectInput("ano",
 Row {data-width=500}
 -----------------------------------------------------------------------
 
-### IDEB para os estados
+### Mapa com IDEB para os estados
 
 ```{r}
 selected_data <- reactive({
@@ -234,7 +220,7 @@ selected_data <- reactive({
     filter(NivelEscolaridade == input$nivelescolaridade, 
            Ano == input$ano,
            Rede == input$rede) %>%
-    mutate(hover = paste("UF:", nome, '<br>','ideb: ',IDEB))
+    mutate(hover = paste("UF:", nome, '<br>','ideb: ', IDEB))
   
   aaa
   })
@@ -244,29 +230,15 @@ output$mapaestados <- renderPlotly({
   selected_data() %>% 
     ggplot() +
     geom_sf(aes(fill = IDEB, text = hover)) +
-    scale_fill_viridis_c(direction = -1, limits = c(2,8),option = "C") -> p
+    scale_fill_viridis_c(direction = -1, limits = c(2,8), option = "C") -> p
   
   g <- ggplotly(p)
   
-  #build <- plotly_build(g)
   
-  #build$data[[1]]$text <- paste0('UF: ', selected_data()$UF, '<br>', 
-  #                               'IDEB: ', as.character(round(selected_data()$IDEB,
-   #                                                           2))) 
-  
-  #build
-   
-  
-  # g %>%
-  #   add_trace(
-  #     z = ~IDEB,
-  #     text =  ~hover,
-  #     locations = ~geometry,
-  #     hoverinfo = 'text',
-  #     marker = list(color='green')) -> g
   g
   
 })
+
 plotlyOutput("mapaestados")
 ```
 
@@ -274,7 +246,7 @@ plotlyOutput("mapaestados")
 Row {data-width=500}
 -----------------------------------------------------------------------
 
-### Desempenho escolar por Taxa de Aprovação para os estados
+### Desempenho escolar vs. Taxa de Aprovação para os estados
 ```{r}
 dados_selecionados <- reactive({
   aab <- estados %>%
@@ -322,5 +294,91 @@ plotlyOutput("teste1")
 ```
 
 
+Comparação
+=====================================
+
+Column{.sidebar}
+----------------------------------------------------------------------- 
+
+
+```{r}
+selectizeInput(inputId = "estados", 
+               label = "Estados a comparar", 
+               choices = unique(estados$UF), 
+               selected = c("RIO DE JANEIRO","SÃO PAULO"), 
+               multiple = TRUE)
+
+selectInput("nivelescolaridadecomp",
+            label = "Nível de Ensino",
+            choices = c("Fundamental anos iniciais" = "EFI",
+                        "Fundamental anos finais" = "EFF",
+                        "Ensino médio" = "EM"),
+            selected = "EFI")
+
+selectInput("redecomp",
+            "Rede de Ensino",
+            choices = c("Pública" = "Estadual",
+                        "Privada" = "Privada",
+                        "Total" = "Total"),
+            selected = "Total")
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+### Evolução do IDEB ao longo do tempo para os estado selecionados
+```{r}
+selec_comp <- reactive({
+  estados %>%
+  filter(Rede == input$redecomp, 
+         UF %in% input$estados, 
+         NivelEscolaridade == input$nivelescolaridadecomp) 
+})
+
+output$complines <- renderPlotly({
+  
+  selec_comp() %>% 
+    ggplot() +
+    geom_line(aes(x = Ano, y = IDEB, colour = UF, group = UF)) -> p
+
+g <- ggplotly(p)
+
+g
+  
+  
+})
+
+plotlyOutput("complines")
+```
+
+
+
+Row
+-----------------------------------------------------------------------
+
+### Boxplots do IDEB para os estados selecionados
+```{r}
+
+selec_comp2 <- reactive({
+  estados %>%
+  filter(UF %in% input$estados) 
+})
+
+output$compbox <- renderPlotly({
+  
+  selec_comp2() %>% 
+    ggplot() +
+    geom_boxplot(aes(x = UF, y = IDEB)) -> p
+
+g <- ggplotly(p)
+
+g
+  
+  
+})
+
+plotlyOutput("compbox")
+```
 
 
