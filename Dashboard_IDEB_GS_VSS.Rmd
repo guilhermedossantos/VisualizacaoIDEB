@@ -140,6 +140,27 @@ plotlyOutput("teste2")
 Escala Regional
 =====================================
 
+###IDEB
+
+```{r}
+estados %>%
+    filter(!ensino %in% c("Total")) %>% 
+    filter(!Ano %in% c("2019", "2021")) %>% 
+    ggplot(aes(x = IDEB,
+               fill = Regiao)) +
+    geom_density(alpha= 0.6) +
+    scale_fill_manual(values = c("blue", "orange", "green", "red", "purple"))+
+    facet_grid(NivelEscolaridade~ensino) +
+    ylab("Densidade") +
+    theme(legend.position = "none")-> p
+
+g <- ggplotly(p)
+
+g
+
+```
+
+
 ### Violinos do IDEB dentro de cada região
 ```{r}
 # estados %>% 
