@@ -1,0 +1,19 @@
+estados %>% 
+    filter(Rede == "Privada",
+           NivelEscolaridade == "EM",
+           UF == "BAHIA") %>% 
+    ggplot() +
+    geom_line(aes(x = Ano, y = IDEB, group = UF)) -> p
+
+g <- ggplotly(p)
+
+g
+
+estados %>% 
+    filter(UF == "BAHIA") %>% 
+    ggplot() +
+    geom_boxplot(aes(x = Rede, y = IDEB)) -> p
+
+g <- ggplotly(p)
+
+g
